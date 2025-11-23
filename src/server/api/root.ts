@@ -1,14 +1,12 @@
 import {
   createCallerFactory,
   createTRPCRouter,
-  protectedProcedure,
 } from "@/server/api/trpc";
 import { catalogRouter } from "./routers/catalog";
 import { clusterRouter } from "./routers/cluster";
 import { credentialsRouter } from "./routers/credentials";
 import { deploymentRouter } from "./routers/deployment";
 import { edgeRouter } from "./routers/edge";
-import { provisionCluster } from "../lib/provisioning";
 
 /**
  * This is the primary router for your server.

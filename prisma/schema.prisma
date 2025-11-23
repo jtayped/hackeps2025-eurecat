@@ -156,5 +156,5 @@ model Node {
     edgeDeviceId String?     @unique
     edgeDevice   EdgeDevice? @relation(fields: [edgeDeviceId], references: [id])
 
-    cluster Cluster @relation(fields: [clusterId], references: [id])
+    cluster Cluster @relation(fields: [clusterId], references: [id], onDelete: Cascade)
 }

@@ -13,7 +13,7 @@ const FunctionalLayout = async ({
   if (!session) return redirect("/api/auth/signin");
 
   return (
-    <div className="grid px-6">
+    <div className="grid px-6 pb-4">
       <Header />
       {children}
       <Toaster />

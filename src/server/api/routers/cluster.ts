@@ -4,6 +4,7 @@ import { Provider, Status } from "@/generated/prisma/enums";
 import { TRPCError } from "@trpc/server";
 import { clusterSchema } from "@/validators/cluster";
 import { provisionCluster } from "@/server/lib/provisioning";
+import { destroyCluster } from "@/server/lib/destruction";
 
 export const clusterRouter = createTRPCRouter({
   create: protectedProcedure
@@ -81,6 +82,7 @@ export const clusterRouter = createTRPCRouter({
                   memoryGB: 0,
                   edgeDeviceId: device.id,
                   privateIp: device.ipAddress,
+                  credentialId: "", // TODO: implement credential ids for edge devices
                 },
               }),
             ),
@@ -91,12 +93,12 @@ export const clusterRouter = createTRPCRouter({
       });
 
       // Provision the cluster
-      void provisionCluster(result.id);
+      await provisionCluster(result.id);
 
       return {
         success: true,
         clusterId: result.id,
-        message: "Cluster provisioning started.",
+        message: "Cluster provisioning ended.",
       };
     }),
 
@@ -159,14 +161,18 @@ export const clusterRouter = createTRPCRouter({
         });
       }
 
-      // Update status to DELETING so UI shows spinner
+      // 1. Update status to DELETING so UI shows spinner immediately
       await ctx.db.cluster.update({
         where: { id: input.clusterId },
         data: { status: Status.DELETING },
       });
 
-      // TRIGGER ASYNC DELETION JOB HERE
-      console.log(`[Job] Deletion triggered for Cluster ${input.clusterId}`);
+      // 2. Trigger Async Destruction
+      // We do NOT await this, so the UI returns immediately.
+      // The user will see the cluster disappear or turn "Deleting" on refresh.
+      destroyCluster(input.clusterId).catch((err) => {
+        console.error("Background destruction failed:", err);
+      });
 
       return { success: true, message: "Cluster deletion initiated." };
     }),

@@ -82,9 +82,7 @@ enum Status {
 // Supported cluster orchestration software
 enum ClusterSoftware {
     K3S
-    NOMAD
     DOCKER_SWARM
-    KUBERNETES
 }
 
 // Stores authentication tokens for cloud providers (Objective 000)

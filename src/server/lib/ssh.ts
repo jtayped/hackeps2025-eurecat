@@ -37,19 +37,31 @@ export async function executeRemoteCommand(
   }
 }
 
-// PRE-BUILT SCRIPTS for Objective 100
 export const INSTALL_SCRIPTS = {
-  DOCKER: [
+  // Option 1: Docker Swarm (The Easiest)
+  DOCKER_SWARM: [
     "curl -fsSL https://get.docker.com -o get-docker.sh",
     "sudo sh get-docker.sh",
-    "sudo usermod -aG docker $USER",
+    "sudo usermod -aG docker ubuntu",
+    // This command turns a normal Docker host into a Swarm Manager
+    "sudo docker swarm init || echo 'Swarm already initialized'",
   ],
-  K3S_MASTER: [
+
+  // Option 2: K3s (The "Kubernetes" Standard)
+  K3S: [
+    // 1. Install K3s
     "curl -sfL https://get.k3s.io | sh -",
-    // Get the token to join workers later
-    "sudo cat /var/lib/rancher/k3s/server/node-token",
-  ],
-  K3S_WORKER: (masterIp: string, token: string) => [
-    `curl -sfL https://get.k3s.io | K3S_URL=https://${masterIp}:6443 K3S_TOKEN=${token} sh -`,
+
+    // 2. Wait for startup
+    "sleep 10",
+
+    // 3. Copy config so 'kubectl' works for the 'ubuntu' user
+    "mkdir -p /home/ubuntu/.kube",
+    "sudo cp /etc/rancher/k3s/k3s.yaml /home/ubuntu/.kube/config",
+    "sudo chown ubuntu:ubuntu /home/ubuntu/.kube/config",
+    "sudo chmod 600 /home/ubuntu/.kube/config",
+
+    // 4. Set alias so you can just type 'kubectl'
+    "echo 'alias kubectl=\"k3s kubectl\"' >> /home/ubuntu/.bashrc",
   ],
 };

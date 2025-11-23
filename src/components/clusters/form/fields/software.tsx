@@ -45,10 +45,6 @@ const SoftwareField = ({
                   Docker Swarm
                 </SelectItem>
                 <SelectItem value={ClusterSoftware.K3S}>K3S</SelectItem>
-                <SelectItem value={ClusterSoftware.KUBERNETES}>
-                  Kubernetes
-                </SelectItem>
-                <SelectItem value={ClusterSoftware.NOMAD}>Nomad</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

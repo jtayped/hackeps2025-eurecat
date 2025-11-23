@@ -33,7 +33,7 @@ export async function createGcpInstance(
   // Format key specifically for GCP metadata
   const gcpKeyVal = formatGcpKey("ubuntu", params.publicKey);
 
-  const [,operation] = await client.insert({
+  const [, operation] = await client.insert({
     project: config.projectId,
     zone,
     instanceResource: {
@@ -77,4 +77,34 @@ export async function createGcpInstance(
     instanceName: params.name,
     success: true,
   };
+}
+
+export async function deleteGcpInstance(
+  config: GcpConfig,
+  instanceName: string,
+) {
+  const credentials = JSON.parse(config.credentialsJson) as object;
+  const client = new InstancesClient({
+    credentials,
+    projectId: config.projectId,
+  });
+
+  const zone = config.zone;
+
+  try {
+    console.log(`[GCP] Deleting instance ${instanceName} in ${zone}...`);
+
+    const [operation] = await client.delete({
+      project: config.projectId,
+      zone,
+      instance: instanceName,
+    });
+
+    // In a real app we might wait for operation completion,
+    // but for delete, firing the request is usually enough.
+    return { success: true, operation };
+  } catch (error) {
+    console.error(`[GCP] Deletion Error for ${instanceName}:`, error);
+    return { success: false, error };
+  }
 }

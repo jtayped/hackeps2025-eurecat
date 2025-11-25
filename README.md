@@ -146,6 +146,44 @@ Given the 24-hour time constraint, there were features we designed but couldn't 
 
 -----
 
+## 🐳 Docker Deployment
+
+If you prefer not to install Node.js or PostgreSQL locally, you can deploy the entire stack using Docker Compose.
+
+1.  **Configure Environment**
+    Ensure your `.env` file includes the specific Postgres variables required by the container.
+    
+    > **⚠️ Important:** When running in Docker, change `localhost` in your `DATABASE_URL` to `db` (the service name in docker-compose).
+
+    ```env
+    # .env
+    POSTGRES_USER=nebulous_user
+    POSTGRES_PASSWORD=securepassword
+    POSTGRES_DB=nebulous_db
+    
+    # Note the host is 'db', not 'localhost'
+    DATABASE_URL="postgresql://nebulous_user:securepassword@db:5432/nebulous_db"
+    
+    NEXTAUTH_SECRET="supersecret"
+    ```
+
+2.  **Start the Services**
+    Build the image and start the containers in detached mode:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+3.  **Initialize the Database**
+    Run the Prisma migrations inside the running container:
+    ```bash
+    docker exec -it nextjs_app npx prisma db push
+    ```
+
+4.  **Access the App**
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
 ## 👥 Authors
 
   * **Joel Taylor** - [LinkedIn](https://www.linkedin.com/in/jtayped/)

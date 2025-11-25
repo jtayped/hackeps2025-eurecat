@@ -176,7 +176,7 @@ If you prefer not to install Node.js or PostgreSQL locally, you can deploy the e
 3.  **Initialize the Database**
     Run the Prisma migrations inside the running container:
     ```bash
-    docker exec -it nextjs_app npx prisma db push
+    docker exec -it nextjs_app npm run db:migrate
     ```
 
 4.  **Access the App**
